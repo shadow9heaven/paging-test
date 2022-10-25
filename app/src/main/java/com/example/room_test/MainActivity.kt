@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
             list.add(RoomEntity().apply {
                 try{
                     id = Integer.parseInt(totalstring[0])
-                    name = totalstring[1]
+                    name = totalstring[1] + "_" + id.toString()
                 }
                 catch (e : Exception){}
             })
