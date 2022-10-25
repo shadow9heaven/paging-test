@@ -20,7 +20,7 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
     lateinit var db : database.RoomDbHelper
     private lateinit var binding: ActivityMainBinding
-    lateinit var viewModel: MainViewModel
+
     lateinit var tv_userlist : TextView
     lateinit var et_name : EditText
     lateinit var et_id: EditText
