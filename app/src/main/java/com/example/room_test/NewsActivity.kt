@@ -20,26 +20,21 @@ class NewsActivity : AppCompatActivity(){
     lateinit var newsDataSourceFactory : DataSourceFactory
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val newsdatasource = NewsDataSource(this)
         newsDataSourceFactory = DataSourceFactory(this, newsdatasource)
-        //val parentname = this.parent.componentName.toString()
-        //Log.e("newsActivity",parentname)
         //var livePagedListBuilder = LivePagedListBuilder(newsDataSourceFactory, newsdatasource.getConfig())
         //var mLiveData: LiveData<PagedList<List<RoomEntity>>> = livePagedListBuilder.build()
-
+        newsAdapter = NewsAdapter(this,newsdatasource)
+        newsBinding.rvList.adapter = newsAdapter
         newsBinding = ActivityNewsBinding.inflate(LayoutInflater.from(this))
         newsBinding.rvList.layoutManager = LinearLayoutManager(this)
         newsBinding.rvList.itemAnimator = null
 
 
-        newsAdapter = NewsAdapter(this,newsdatasource)
-        /*
-        mLiveData.observe(this,Observer{ it->
-            newsAdapter.submitList(it)
-        })
-*/
 
-        newsBinding.rvList.adapter = newsAdapter
+
+
         setContentView(newsBinding.root)
 
     }
