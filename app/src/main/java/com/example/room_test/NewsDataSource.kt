@@ -82,7 +82,7 @@ class NewsDataSource(
     }
 }
 
-class DataSourceFactory (val context: Context, val source : NewsDataSource) : DataSource.Factory<Int, List<RoomEntity>>() {
+class DataSourceFactory (val source : NewsDataSource) : DataSource.Factory<Int, List<RoomEntity>>() {
 
     private val sourceLiveData = MutableLiveData<NewsDataSource>()
 

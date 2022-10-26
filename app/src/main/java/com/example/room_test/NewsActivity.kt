@@ -22,7 +22,7 @@ class NewsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val newsdatasource = NewsDataSource(this)
-        newsDataSourceFactory = DataSourceFactory(this, newsdatasource)
+        newsDataSourceFactory = DataSourceFactory( newsdatasource)
         //var livePagedListBuilder = LivePagedListBuilder(newsDataSourceFactory, newsdatasource.getConfig())
         //var mLiveData: LiveData<PagedList<List<RoomEntity>>> = livePagedListBuilder.build()
         newsAdapter = NewsAdapter(this, newsdatasource)

@@ -9,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.paging.PagedListAdapter
+import androidx.paging.toLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.room_test.NewsViewHolder.Companion.diffCallback
@@ -27,9 +29,10 @@ class NewsAdapter constructor(
     //private lateinit var mPostLiveData: MutableLiveData<List<RoomEntity>>
     //private val sourceLiveData = MutableLiveData<List<RoomEntity>>()
     //sourceLiveData.postValue(source)
-    val dataSourceFactory: DataSourceFactory = DataSourceFactory(context, newsDataSource)
+    val dataSourceFactory: DataSourceFactory = DataSourceFactory( newsDataSource)
     var livePagedListBuilder = LivePagedListBuilder(dataSourceFactory, newsDataSource.getConfig())
     var mLiveData: LiveData<PagedList<List<RoomEntity>>> = livePagedListBuilder.build()
+    val PVM = PagingViewModel(dataSourceFactory)
 
     //lateinit var lifecycleOwner : LifecycleOwner
 
@@ -40,7 +43,6 @@ class NewsAdapter constructor(
 //    var mRecyclerView: RecyclerView? = null
 //    //var myListAdapter: MyListAdapter? = null
 //    var arrayList: ArrayList<HashMap<String, String>> = ArrayList()
-
     @SuppressLint("ResourceType")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val vh = NewsViewHolder(parent)
@@ -50,7 +52,6 @@ class NewsAdapter constructor(
                 //Log.e("lifecycleowner", jt.size.toString())
                 this.submitList(jt)
                 if (jt.size > 0){
-
                     dataSourceLoaded = true
                     //ioThread {
                         //val tv = vh.itemView.findViewById<TextView>(R.id.tv_menuname)
@@ -61,12 +62,10 @@ class NewsAdapter constructor(
                 else{
                     //Log.e("","")
                 }
-
             }
         }
         return vh
         //add data
-
     }
 
     override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
@@ -79,20 +78,18 @@ class NewsAdapter constructor(
                 try {
                     //datalist = getItem(0) as MutableList<RoomEntity>
                     val content = getItem(0)
-
                     if (content != null) {
                         if (content.size>0) {
 //                            Log.e("onBindViewHolder", position.toString() + ":" + content.size.toString())
                             viewHolder.bindTo(content[position])
                         }
                     }
-
                 } catch (e: Exception) {
                     Log.e("BVHException", "page:" + position.toString() + " = " + e.message!!)
                 }
             }
-
         }
+
     }
 
     override fun getItemId(position: Int): Long {
@@ -154,7 +151,14 @@ class NewsViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     }
 }
 
+class PagingViewModel(sFactory:  DataSourceFactory): ViewModel() {
 
+    //private val sFactory
+
+    val pagingDataItems: LiveData<PagedList<List<RoomEntity>>> by lazy {
+        sFactory.toLiveData(5, null)
+    }
+}
 
 class PagingBoundaryCallback(context: Context) :
     PagedList.BoundaryCallback<RoomEntity>() {
