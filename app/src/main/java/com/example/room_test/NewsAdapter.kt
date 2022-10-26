@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.paging.LivePagedListBuilder
@@ -29,37 +30,47 @@ class NewsAdapter constructor(
     //private lateinit var mPostLiveData: MutableLiveData<List<RoomEntity>>
     //private val sourceLiveData = MutableLiveData<List<RoomEntity>>()
     //sourceLiveData.postValue(source)
-    val dataSourceFactory: DataSourceFactory = DataSourceFactory( newsDataSource)
+    val dataSourceFactory: DataSourceFactory = DataSourceFactory(newsDataSource)
+
     var livePagedListBuilder = LivePagedListBuilder(dataSourceFactory, newsDataSource.getConfig())
-    var mLiveData: LiveData<PagedList<List<RoomEntity>>> = livePagedListBuilder.build()
-    val PVM = PagingViewModel(dataSourceFactory)
+    var mLiveData: LiveData<PagedList<List<RoomEntity>>> =
+        livePagedListBuilder.setBoundaryCallback(PagingBoundaryCallback(context)).build()
+
+    //val PVM = PagingViewModel(dataSourceFactory)
+    //var mLiveData: LiveData<PagedList<List<RoomEntity>>> = PVM.pagingDataItems
 
     //lateinit var lifecycleOwner : LifecycleOwner
 
     val lock = java.lang.Object()
+
     //var current_page = 0
     var dataSourceLoaded = false
-    lateinit var datalist : MutableList<RoomEntity>
-//    var mRecyclerView: RecyclerView? = null
+    lateinit var datalist: MutableList<RoomEntity>
+
+    //    var mRecyclerView: RecyclerView? = null
 //    //var myListAdapter: MyListAdapter? = null
 //    var arrayList: ArrayList<HashMap<String, String>> = ArrayList()
     @SuppressLint("ResourceType")
+    override fun onCurrentListChanged(currentList: PagedList<List<RoomEntity>>?) {
+        super.onCurrentListChanged(currentList)
+
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val vh = NewsViewHolder(parent)
         parent.findViewTreeLifecycleOwner()?.let {
             mLiveData.observe(it) { jt ->
                 ///add  datasource to pagedlist
-                //Log.e("lifecycleowner", jt.size.toString())
+                Log.e("lifecycleowner", jt.size.toString())
                 this.submitList(jt)
-                if (jt.size > 0){
+
+                if (jt.size > 0) {
                     dataSourceLoaded = true
                     //ioThread {
-                        //val tv = vh.itemView.findViewById<TextView>(R.id.tv_menuname)
-                        //tv.text = jt[0][]?.name ?: ""
+                    //val tv = vh.itemView.findViewById<TextView>(R.id.tv_menuname)
+                    //tv.text = jt[0][]?.name ?: ""
                     //}
                     //notifyItemRangeChanged(0,16)
-                }
-                else{
+                } else {
                     //Log.e("","")
                 }
             }
@@ -76,12 +87,14 @@ class NewsAdapter constructor(
             //current_page = position
             if (dataSourceLoaded) {
                 try {
+                    val page = position /100
+                    val real_position = position -(page *100)
                     //datalist = getItem(0) as MutableList<RoomEntity>
-                    val content = getItem(0)
+                    val content = getItem(page)
                     if (content != null) {
-                        if (content.size>0) {
+                        if (content.size > 0) {
 //                            Log.e("onBindViewHolder", position.toString() + ":" + content.size.toString())
-                            viewHolder.bindTo(content[position])
+                            viewHolder.bindTo(content[real_position])
                         }
                     }
                 } catch (e: Exception) {
@@ -97,7 +110,7 @@ class NewsAdapter constructor(
     }
 
     override fun getItemCount(): Int {
-        return 100
+        return 300
     }
 
 
@@ -107,14 +120,13 @@ class NewsAdapter constructor(
 class NewsViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     LayoutInflater.from(parent.context).inflate(R.layout.item_myholder, parent, false)
 ) {
-//    var room: MutableList<RoomEntity> = mutableListOf()
+    //    var room: MutableList<RoomEntity> = mutableListOf()
 //        private set
 //    private val recyclerView = itemView.findViewById<RecyclerView>(R.id.rv_users)
     var room: RoomEntity? = null
-
         private set
     private val textView = itemView.findViewById<TextView>(R.id.tv_menuname)
-
+    //val nameObserver : Observer<>
     fun bindTo(item: RoomEntity?) {
         if (item != null) {
             room = item
@@ -151,18 +163,35 @@ class NewsViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     }
 }
 
-class PagingViewModel(sFactory:  DataSourceFactory): ViewModel() {
+class PagingViewModel(sFactory: DataSourceFactory) : ViewModel() {
 
     //private val sFactory
 
     val pagingDataItems: LiveData<PagedList<List<RoomEntity>>> by lazy {
-        sFactory.toLiveData(5, null)
+        sFactory.toLiveData(3, null)
     }
 }
 
+
 class PagingBoundaryCallback(context: Context) :
-    PagedList.BoundaryCallback<RoomEntity>() {
+    PagedList.BoundaryCallback<List<RoomEntity>>() {
+    override fun onZeroItemsLoaded() {
+        super.onZeroItemsLoaded()
+        Log.e("boundaryCallBack", "onzeroitemloaded")
+    }
+
+    override fun onItemAtFrontLoaded(itemAtFront: List<RoomEntity>) {
+        super.onItemAtFrontLoaded(itemAtFront)
+        Log.e("boundaryCallBack", "onitematfrontloaded")
+    }
+
+    override fun onItemAtEndLoaded(itemAtEnd: List<RoomEntity>) {
+        super.onItemAtEndLoaded(itemAtEnd)
+        Log.e("boundaryCallBack", "onitematendloaded")
+    }
     //val pagingDataItems: LiveData<PagedList<RoomEntity>> by lazy {
     //ewsDataFactory.toLiveData(6, null)
     //}
+
+
 }

@@ -32,10 +32,6 @@ class NewsActivity : AppCompatActivity() {
         newsBinding.rvList.layoutManager = LinearLayoutManager(this)
         newsBinding.rvList.itemAnimator = null
 
-
-
-
-
         setContentView(newsBinding.root)
 
     }
