@@ -21,7 +21,7 @@ class NewsDataSource(
     }
 
     val db = database.RoomDbHelper(context)
-    var page = 1
+    var page = DEFAULT_PAGE
 
     override fun loadInitial(params: PageKeyedDataSource.LoadInitialParams<Int>,
                              callback: PageKeyedDataSource.LoadInitialCallback<Int, List<RoomEntity>>
@@ -52,6 +52,7 @@ class NewsDataSource(
             list.add(data)
 
             callback.onResult(list, params.key+1)
+            
         }
 
     }
@@ -64,23 +65,35 @@ class NewsDataSource(
     }
     fun getConfig(): PagedList.Config {
         return PagedList.Config.Builder()
+            .setPageSize(PAGE_SIZE)
+            .setEnablePlaceholders(true)
+            .setInitialLoadSizeHint(DEFAULT_LOAD_SIZE)
             .build()
     }
 
     private fun loadPage(i: Int, callback: PageKeyedDataSource.LoadCallback<Int,List<RoomEntity>>) {
 
     }
-
+    companion object {
+        const val DEFAULT_PAGE = 1
+        const val BUFFER_PAGE_COUNT = 1
+        const val PAGE_SIZE = 10
+        const val DEFAULT_LOAD_SIZE = PAGE_SIZE * BUFFER_PAGE_COUNT
+    }
 }
 
 class DataSourceFactory (val context: Context, val source : NewsDataSource) : DataSource.Factory<Int, List<RoomEntity>>() {
 
-    //private val sourceLiveData = MutableLiveData<NewsDataSource>()
+    private val sourceLiveData = MutableLiveData<NewsDataSource>()
+
     override fun create(): PageKeyedDataSource<Int, List<RoomEntity>> {
-        //val source = NewsDataSource(context)
-        //sourceLiveData.postValue(source)
+
+        sourceLiveData.postValue(source)
 
         Log.e("datasourcefactory", source.page.toString())
         return source as PageKeyedDataSource<Int, List<RoomEntity>>
+    }
+    fun refresh(){
+
     }
 }
