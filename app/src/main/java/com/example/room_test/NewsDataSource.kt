@@ -2,6 +2,7 @@ package com.example.room_test
 
 
 import android.content.Context
+import android.os.Handler
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.paging.DataSource
@@ -48,6 +49,8 @@ class NewsDataSource(
             page += 1
             val data = db.getRoomDao().getPage(params.key - 1 )
             list.add(data)
+            totalItem += data.size
+
             callback.onResult(list, params.key+1)
         }
 

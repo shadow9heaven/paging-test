@@ -5,7 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".NewsActivity">
+    tools:context=".NewsActivity"
+    android:background="@color/black"
+    >
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/srl_news"
@@ -16,7 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
-        android:scrollbarSize="20dp"
+        android:scrollbarSize="200dp"
+        android:scrollbarAlwaysDrawVerticalTrack="true"
         android:scrollbars="vertical"
         app:layoutManager="LinearLayoutManager"
         />

@@ -20,8 +20,9 @@ interface DAO {
 
         @Query("SELECT * FROM room_entity")
         fun getAll(): MutableList<RoomEntity>
-
-        @Query("SELECT * FROM room_entity LIMIT :page*100,100")
+        //val ITEMEACHTIME = 10
+        //val INITIALITEM = 30
+        @Query("SELECT * FROM room_entity LIMIT :page*10, 10")
         fun getPage( page: Int): MutableList<RoomEntity>
 
         @Delete

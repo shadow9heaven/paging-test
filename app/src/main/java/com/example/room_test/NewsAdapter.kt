@@ -21,6 +21,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.room_test.NewsViewHolder.Companion.diffCallback
 
+val ITEMEACHTIME = 10
+val INITIALITEM = 30
+var totalItem = INITIALITEM
 
 class NewsAdapter constructor(
     private val context: Context,
@@ -32,7 +35,10 @@ class NewsAdapter constructor(
     //private val sourceLiveData = MutableLiveData<List<RoomEntity>>()
     //sourceLiveData.postValue(source)
     val dataSourceFactory: DataSourceFactory = DataSourceFactory(newsDataSource)
-    var totalItem = 100
+
+
+
+
     var livePagedListBuilder = LivePagedListBuilder(dataSourceFactory, newsDataSource.getConfig())
     var mLiveData: LiveData<PagedList<List<RoomEntity>>> =
         livePagedListBuilder.setBoundaryCallback(PagingBoundaryCallback(context)).build()
@@ -52,8 +58,13 @@ class NewsAdapter constructor(
     @SuppressLint("ResourceType")
     override fun onCurrentListChanged(currentList: PagedList<List<RoomEntity>>?) {
         super.onCurrentListChanged(currentList)
-
+        Handler().post {
+            Runnable {
+                dataSourceFactory.refresh()
+            }
+        }
     }
+
     @SuppressLint("NotifyDataSetChanged")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val vh = NewsViewHolder(parent)
@@ -68,20 +79,16 @@ class NewsAdapter constructor(
 
                     dataSourceLoaded = true
                     //newsDataSource.invalidate()
-                    if(totalItem != jt.size *100){
-                        totalItem = jt.size *100
-                        Handler().post{
-                            Runnable {
-                                dataSourceFactory.refresh()
-                            }
-                        }
-                    }
+                    //if(totalItem <= jt.size *ITEMEACHTIME){
+
+
+                    //}
                     //ioThread {
                     //val tv = vh.itemView.findViewById<TextView>(R.id.tv_menuname)
                     //tv.text = jt[0][]?.name ?: ""
                     //}
 //                    ioThread {
-                       //notifyItemRangeChanged(0,16)
+                    //notifyItemRangeChanged(0,16)
 //                    }
                 } else {
                     //Log.e("","")
@@ -100,8 +107,8 @@ class NewsAdapter constructor(
             //current_page = position
             if (dataSourceLoaded) {
                 try {
-                    val page = position /100
-                    val real_position = position -(page *100)
+                    val page = position / ITEMEACHTIME
+                    val real_position = position - (page * ITEMEACHTIME)
                     //datalist = getItem(0) as MutableList<RoomEntity>
                     val content = getItem(page)
                     if (content != null) {
@@ -123,7 +130,7 @@ class NewsAdapter constructor(
     }
 
     override fun getItemCount(): Int {
-        return 1000
+        return totalItem
     }
 
 
@@ -139,6 +146,7 @@ class NewsViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
     var room: RoomEntity? = null
         private set
     private val textView = itemView.findViewById<TextView>(R.id.tv_menuname)
+
     //val nameObserver : Observer<>
     fun bindTo(item: RoomEntity?) {
         if (item != null) {
