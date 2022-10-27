@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
-        android:scrollbarSize="5dp"
+        android:scrollbarSize="20dp"
         android:scrollbars="vertical"
         app:layoutManager="LinearLayoutManager"
         />

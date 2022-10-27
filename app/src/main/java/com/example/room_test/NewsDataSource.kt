@@ -46,13 +46,9 @@ class NewsDataSource(
         GlobalScope.launch{
             val list = mutableListOf<List<RoomEntity>>()
             page += 1
-
             val data = db.getRoomDao().getPage(params.key - 1 )
-
             list.add(data)
-
             callback.onResult(list, params.key+1)
-            
         }
 
     }
@@ -77,7 +73,7 @@ class NewsDataSource(
     companion object {
         const val DEFAULT_PAGE = 1
         const val BUFFER_PAGE_COUNT = 1
-        const val PAGE_SIZE = 1
+        const val PAGE_SIZE = 2
         const val DEFAULT_LOAD_SIZE = PAGE_SIZE * BUFFER_PAGE_COUNT
     }
 }
@@ -94,7 +90,7 @@ class DataSourceFactory (val source : NewsDataSource) : DataSource.Factory<Int, 
         return source as PageKeyedDataSource<Int, List<RoomEntity>>
     }
     fun refresh(){
-
+        sourceLiveData.value?.invalidate()
     }
 }
 

@@ -3,6 +3,7 @@ package com.example.room_test
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -31,7 +32,7 @@ class NewsAdapter constructor(
     //private val sourceLiveData = MutableLiveData<List<RoomEntity>>()
     //sourceLiveData.postValue(source)
     val dataSourceFactory: DataSourceFactory = DataSourceFactory(newsDataSource)
-
+    var totalItem = 100
     var livePagedListBuilder = LivePagedListBuilder(dataSourceFactory, newsDataSource.getConfig())
     var mLiveData: LiveData<PagedList<List<RoomEntity>>> =
         livePagedListBuilder.setBoundaryCallback(PagingBoundaryCallback(context)).build()
@@ -40,9 +41,7 @@ class NewsAdapter constructor(
     //var mLiveData: LiveData<PagedList<List<RoomEntity>>> = PVM.pagingDataItems
 
     //lateinit var lifecycleOwner : LifecycleOwner
-
-    val lock = java.lang.Object()
-
+    //val lock = java.lang.Object()
     //var current_page = 0
     var dataSourceLoaded = false
     lateinit var datalist: MutableList<RoomEntity>
@@ -55,6 +54,7 @@ class NewsAdapter constructor(
         super.onCurrentListChanged(currentList)
 
     }
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val vh = NewsViewHolder(parent)
         parent.findViewTreeLifecycleOwner()?.let {
@@ -63,13 +63,26 @@ class NewsAdapter constructor(
                 Log.e("lifecycleowner", jt.size.toString())
                 this.submitList(jt)
 
+
                 if (jt.size > 0) {
+
                     dataSourceLoaded = true
+                    //newsDataSource.invalidate()
+                    if(totalItem != jt.size *100){
+                        totalItem = jt.size *100
+                        Handler().post{
+                            Runnable {
+                                dataSourceFactory.refresh()
+                            }
+                        }
+                    }
                     //ioThread {
                     //val tv = vh.itemView.findViewById<TextView>(R.id.tv_menuname)
                     //tv.text = jt[0][]?.name ?: ""
                     //}
-                    //notifyItemRangeChanged(0,16)
+//                    ioThread {
+                       //notifyItemRangeChanged(0,16)
+//                    }
                 } else {
                     //Log.e("","")
                 }
@@ -110,7 +123,7 @@ class NewsAdapter constructor(
     }
 
     override fun getItemCount(): Int {
-        return 300
+        return 1000
     }
 
 
